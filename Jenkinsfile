@@ -46,9 +46,16 @@ pipeline {
       }
       steps {
         container('docker') {
-          script {
-            sh "docker build -t ${REGISTRY_NAME}.azurecr.io/${REPOSITORY_NAME}:$BUILD_NUMBER ." 
-          }
+          withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws-credential',
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+          ]]) {
+              sh "docker build --no-cache -t ${REGISTRY_NAME}.azurecr.io/${REPOSITORY_NAME}:$BUILD_NUMBER ." 
+              // sh 'aws ecr get-login-password | docker login --username AWS --password-stdin 419092857987.dkr.ecr.ap-southeast-3.amazonaws.com'
+              // sh 'docker push 419092857987.dkr.ecr.ap-southeast-3.amazonaws.com/cmi-landing-production:latest'
+            }
         }
       }
     }
