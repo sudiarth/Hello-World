@@ -5,9 +5,12 @@ def getGitBranchName() {
 pipeline {
 
   environment {
+    GIT_BRANCH = getGitBranchName()
     CONTAINER_REGISTRY_CREDENTIALS = credentials('AzureContainerRegistry')
     AWS_DEFAULT_REGION = 'ap-southeast-3'
-    GIT_BRANCH = getGitBranchName()
+    REGISTRY_NAME = "helloworldsudigital"
+    REPOSITORY_NAME = "hellow"
+    ACR_LOGIN_SERVER = "${REGISTRY_NAME}.azurecr.io"
   }
   
   agent {
@@ -43,8 +46,25 @@ pipeline {
       }
       steps {
         container('docker') {
-          script {
-            sh 'az --version'
+          // Building Docker Image 
+          stage ('Build Docker image') {
+              steps {
+                  script {
+                      sh "docker build -t ${REGISTRY_NAME}.azurecr.io/${REPOSITORY_NAME}:$BUILD_NUMBER ." 
+                  }
+              }
+          }
+
+          // Uploading Docker images into ACR
+          stage('Upload Image to ACR') {
+              steps{   
+                  script {
+                      withCredentials([usernamePassword(credentialsId: 'AzureContainerRegistry', usernameVariable: 'SERVICE_PRINCIPAL_ID', passwordVariable: 'SERVICE_PRINCIPAL_PASSWORD')]) {
+                          sh "docker login ${ACR_LOGIN_SERVER} -u $SERVICE_PRINCIPAL_ID -p $SERVICE_PRINCIPAL_PASSWORD"
+                          sh "docker push ${REGISTRY_NAME}.azurecr.io/${REPOSITORY_NAME}:$BUILD_NUMBER"
+                      }
+                  }
+              }
           }
         }
       }
