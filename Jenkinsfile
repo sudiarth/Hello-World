@@ -39,11 +39,6 @@ pipeline {
     }
 
     stage('Build and Push Docker Image (dev)') {
-      when {
-        expression {
-          GIT_BRANCH == 'dev'
-        }
-      }
       steps {
         container('docker') {
           withCredentials([usernamePassword(credentialsId: 'azure-cli-2024-06-17-13-49-37', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
@@ -53,16 +48,6 @@ pipeline {
             sh 'az acr build --image $REPO/$IMAGE_NAME:$TAG --registry $CONTAINER_REGISTRY --file Dockerfile . '
           }
         }
-      }
-    }
-    stage('Unsupported Branch') {
-      when {
-        expression {
-          !(GIT_BRANCH == 'production' || GIT_BRANCH == 'dev')
-        }
-      }
-      steps {
-        error "Branch ${GIT_BRANCH} is not supported for building Docker image."
       }
     }
   }
