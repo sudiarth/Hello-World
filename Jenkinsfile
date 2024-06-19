@@ -5,7 +5,7 @@ def getGitBranchName() {
 pipeline {
 
   environment {
-    CONTAINER_REGISTRY_CREDENTIALS = credentials('dockerhub-login')
+    CONTAINER_REGISTRY_CREDENTIALS = credentials('AzureContainerRegistry')
     AWS_DEFAULT_REGION = 'ap-southeast-3'
     GIT_BRANCH = getGitBranchName()
   }
