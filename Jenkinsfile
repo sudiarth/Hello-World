@@ -6,10 +6,6 @@ pipeline {
 
   environment {
     DOCKER_REGISTRY_CREDENTIALS = credentials('AzureCredential')
-    CONTAINER_REGISTRY='helloworldsudigital'
-    RESOURCE_GROUP='sudigitalcluster-rg'
-    REPO="hellow"
-    IMAGE_NAME="hellow"
   }
   
   agent {
@@ -40,9 +36,9 @@ pipeline {
     stage('Build and Push Docker Image (dev)') {
       steps {
         container('docker') {
-          sh "docker build -t helloworldsudigital/hello-world:${VERSION} ."
+          sh "docker build -t helloworldsudigital/hello-world:latest ."
           sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login helloworldsudigital.azurecr.io --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
-          sh "docker push helloworldsudigital/hello-world:${VERSION}"
+          sh "docker push helloworldsudigital/hello-world:latest"
         }
       }
     }
