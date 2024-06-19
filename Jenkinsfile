@@ -5,6 +5,7 @@ def getGitBranchName() {
 pipeline {
 
   environment {
+    DOCKER_REGISTRY_CREDENTIALS = credentials('AzureCredential')
     CONTAINER_REGISTRY='helloworldsudigital'
     RESOURCE_GROUP='sudigitalcluster-rg'
     REPO="hellow"
@@ -39,12 +40,9 @@ pipeline {
     stage('Build and Push Docker Image (dev)') {
       steps {
         container('docker') {
-          withCredentials([usernamePassword(credentialsId: '1cb329ce-1ad0-4619-b710-41e276614f13', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
-            sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
-            sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
-            sh 'az acr login --name $CONTAINER_REGISTRY --resource-group $RESOURCE_GROUP'
-            sh 'az acr build --image $REPO/$IMAGE_NAME:$TAG --registry $CONTAINER_REGISTRY --file Dockerfile . '
-          }
+          sh "docker build -t helloworldsudigital/hello-world:${VERSION} ."
+          sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login helloworldsudigital.azurecr.io --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
+          sh "docker push helloworldsudigital/hello-world:${VERSION}"
         }
       }
     }
