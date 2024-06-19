@@ -36,9 +36,9 @@ pipeline {
     stage('Build and Push Docker Image (dev)') {
       steps {
         container('docker') {
-          sh "docker build -t helloworldsudigital/hello-world:latest ."
+          sh "docker build -t helloworldsudigital.azurecr.io/hello-world ."
           sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login helloworldsudigital.azurecr.io --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
-          sh "docker push helloworldsudigital/hello-world:latest"
+          sh "docker push helloworldsudigital.azurecr.io/hello-world:latest"
         }
       }
     }
