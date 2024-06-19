@@ -5,8 +5,6 @@ def getGitBranchName() {
 pipeline {
 
   environment {
-    AZURE_SUBSCRIPTION_ID='1a329798-f495-4d9c-8622-d52eac6b7169'
-    AZURE_TENANT_ID='5def484d-a1e3-4154-b6f8-0eb8d4c41e13"'
     CONTAINER_REGISTRY='helloworldsudigital'
     RESOURCE_GROUP='sudigitalcluster-rg'
     REPO="hellow"
@@ -41,7 +39,7 @@ pipeline {
     stage('Build and Push Docker Image (dev)') {
       steps {
         container('docker') {
-          withCredentials([usernamePassword(credentialsId: 'AzureCredential', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
+          withCredentials([usernamePassword(credentialsId: '1cb329ce-1ad0-4619-b710-41e276614f13', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
             sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
             sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
             sh 'az acr login --name $CONTAINER_REGISTRY --resource-group $RESOURCE_GROUP'
