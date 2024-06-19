@@ -41,7 +41,7 @@ pipeline {
     stage('Build and Push Docker Image (dev)') {
       steps {
         container('docker') {
-          withCredentials([usernamePassword(credentialsId: 'azure-cli-2024-06-17-13-49-37', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
+          withCredentials([usernamePassword(credentialsId: 'AzureCredential', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
             sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
             sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
             sh 'az acr login --name $CONTAINER_REGISTRY --resource-group $RESOURCE_GROUP'
