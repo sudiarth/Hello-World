@@ -5,12 +5,12 @@ def getGitBranchName() {
 pipeline {
 
   environment {
-    CONTAINER_REGISTRY_CREDENTIALS = credentials('AzureContainerRegistry')
-    AWS_DEFAULT_REGION = 'ap-southeast-3'
-    GIT_BRANCH = getGitBranchName()
-    REGISTRY_NAME = "helloworldsudigital"
-    ACR_LOGIN_SERVER = "${REGISTRY_NAME}.azurecr.io"
-    REPOSITORY_NAME = "hellow"
+    AZURE_SUBSCRIPTION_ID='1a329798-f495-4d9c-8622-d52eac6b7169'
+    AZURE_TENANT_ID='5def484d-a1e3-4154-b6f8-0eb8d4c41e13"'
+    CONTAINER_REGISTRY='helloworldsudigital'
+    RESOURCE_GROUP='sudigitalcluster-rg'
+    REPO="hellow"
+    IMAGE_NAME="hellow"
   }
   
   agent {
@@ -46,16 +46,15 @@ pipeline {
       }
       steps {
         container('docker') {
-          withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: 'aws-credential',
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-          ]]) {
-              sh "docker build --no-cache -t ${REGISTRY_NAME}.azurecr.io/${REPOSITORY_NAME}:$BUILD_NUMBER ." 
-              // sh 'aws ecr get-login-password | docker login --username AWS --password-stdin 419092857987.dkr.ecr.ap-southeast-3.amazonaws.com'
-              // sh 'docker push 419092857987.dkr.ecr.ap-southeast-3.amazonaws.com/cmi-landing-production:latest'
-            }
+          withCredentials([usernamePassword(credentialsId: 'azure-cli-2024-06-17-13-49-37', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
+            sh 'echo $AZURE_CLIENT_ID'
+            sh 'echo $AZURE_CLIENT_SECRET'
+            sh 'echo $AZURE_TENANT_ID'
+            // sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+            // sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
+            // sh 'az acr login --name $CONTAINER_REGISTRY --resource-group $RESOURCE_GROUP'
+            // sh 'az acr build --image $REPO/$IMAGE_NAME:$TAG --registry $CONTAINER_REGISTRY --file Dockerfile . '
+          }
         }
       }
     }
