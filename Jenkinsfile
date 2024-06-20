@@ -5,6 +5,7 @@ def getGitBranchName() {
 pipeline {
 
   environment {
+    GIT_BRANCH = getGitBranchName()
     DOCKER_REGISTRY_CREDENTIALS = credentials('AzureCredential')
     VERSION = "${env.BUILD_ID}"
   }
@@ -50,7 +51,8 @@ pipeline {
           withCredentials([azureServicePrincipal('azure-principal-credential')]) {
             sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
             sh 'az aks get-credentials --resource-group sudigitalcluster-rg --name sudigitalcluster-aks'
-            sh 'kubectl get nodes'
+            sh 'kubectl version'
+            sh 'kubectl rollout restart deployment hello-world -n ${GIT_BRANCH}'
           }
         }
       }
