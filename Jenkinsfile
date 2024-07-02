@@ -61,27 +61,47 @@ pipeline {
                 sh "echo $SSH_KEY > ~/.ssh/id_ed25519"
                 sh "chmod 600 ~/.ssh/id_ed25519"
                 sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
-                dir("$repoDir") {                  
-                  echo 'Updating Image TAG'
+                sh "cd "
+                echo 'Updating Image TAG'
 
-                  // Update the image tag in the values.yaml file
-                  sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
+                // Update the image tag in the values.yaml file
+                sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
 
-                  echo 'Git Config'
+                echo 'Git Config'
 
-                  // Set Git configurations
-                  sh 'git config --global user.email "lanxic@gmail.com"'
-                  sh 'git config --global user.name "lanxic"'
+                // Set Git configurations
+                sh 'git config --global user.email "lanxic@gmail.com"'
+                sh 'git config --global user.name "lanxic"'
 
-                  // Add changes
-                  sh 'git add hello-world/values.yaml'
+                // Add changes
+                sh 'git add hello-world/values.yaml'
 
-                  // Commit changes
-                  sh "git commit -m 'Update Image tag to ${VERSION}'"
+                // Commit changes
+                sh "git commit -m 'Update Image tag to ${VERSION}'"
 
-                  // Push changes to the master branch using the SSH key
-                  sh "git push origin master"
-                }
+                // Push changes to the master branch using the SSH key
+                sh "git push origin master"
+                // dir("$repoDir") {                  
+                //   echo 'Updating Image TAG'
+
+                //   // Update the image tag in the values.yaml file
+                //   sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
+
+                //   echo 'Git Config'
+
+                //   // Set Git configurations
+                //   sh 'git config --global user.email "lanxic@gmail.com"'
+                //   sh 'git config --global user.name "lanxic"'
+
+                //   // Add changes
+                //   sh 'git add hello-world/values.yaml'
+
+                //   // Commit changes
+                //   sh "git commit -m 'Update Image tag to ${VERSION}'"
+
+                //   // Push changes to the master branch using the SSH key
+                //   sh "git push origin master"
+                // }
               } catch (Exception e) {
                 echo "An error occurred: ${e.getMessage()}"
                 currentBuild.result = 'FAILURE'
