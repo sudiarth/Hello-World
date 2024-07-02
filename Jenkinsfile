@@ -52,34 +52,37 @@ pipeline {
             script {
               def repoDir = "${env.WORKSPACE}/manifest"
               try {
-                // Add GitHub to known hosts
-                sh "mkdir -p ~/.ssh"
-                sh "echo $SSH_KEY > ~/.ssh/id_ed25519"
-                sh "chmod 600 ~/.ssh/id_ed25519"
-                sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
-
                 // Clone the repository using SSH key into a specific directory
                 sh "rm -rf '${repoDir}'"  // Clean up if the directory already exists
                 sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
+                dir("$repoDir") {
 
-                sh "cd $repoDir"
+                  // Add GitHub to known hosts
+                  sh "mkdir -p ~/.ssh"
+                  sh "echo $SSH_KEY > ~/.ssh/id_ed25519"
+                  sh "chmod 600 ~/.ssh/id_ed25519"
+                  sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+                  
+                  echo 'Updating Image TAG'
 
-                sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
+                  // Update the image tag in the values.yaml file
+                  sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
 
-                echo 'Git Config'
+                  echo 'Git Config'
 
-                // Set Git configurations
-                sh 'git config --global user.email "lanxic@gmail.com"'
-                sh 'git config --global user.name "lanxic"'
+                  // Set Git configurations
+                  sh 'git config --global user.email "lanxic@gmail.com"'
+                  sh 'git config --global user.name "lanxic"'
 
-                // Add changes
-                sh 'git add hello-world/values.yaml'
+                  // Add changes
+                  sh 'git add hello-world/values.yaml'
 
-                // Commit changes
-                sh "git commit -m 'Update Image tag to ${VERSION}'"
+                  // Commit changes
+                  sh "git commit -m 'Update Image tag to ${VERSION}'"
 
-                // Push changes to the master branch using the SSH key
-                sh "git push origin master"
+                  // Push changes to the master branch using the SSH key
+                  sh "git push origin master"
+                }
               } catch (Exception e) {
                 echo "An error occurred: ${e.getMessage()}"
                 currentBuild.result = 'FAILURE'
