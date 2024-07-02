@@ -45,29 +45,27 @@ pipeline {
       }
     }
 
-     stages {
-        stage('Update Manifest') {
-            steps {
-                script {
-                    def repoDir = "${env.WORKSPACE}/manifest"
-                    withCredentials([sshUserPrivateKey(credentialsId: jenkins, keyFileVariable: 'SSH_KEY')]) {
-                        sh '''
-                          eval "$(ssh-agent -s)"
-                          ssh-add $SSH_KEY
-                          mkdir -p ~/.ssh
-                          echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-                          git clone git@github.com:sudiarth/manifest.git ''' + repoDir + '''
-                          cd ''' + repoDir + '''
-                          echo "Updating Image TAG - $VERSION"
-                          sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml
-                          echo "Git Config"
-                          git config --global user.email "lanxic@gmail.com"
-                          git config --global user.name "lanxic"
-                          git add hello-world/values.yaml
-                          git commit -m "Update Image tag to $VERSION"
-                          git push origin master
-                          '''
-                    }
+    stage('Update Manifest') {
+        steps {
+            script {
+                def repoDir = "${env.WORKSPACE}/manifest"
+                withCredentials([sshUserPrivateKey(credentialsId: jenkins, keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                      eval "$(ssh-agent -s)"
+                      ssh-add $SSH_KEY
+                      mkdir -p ~/.ssh
+                      echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+                      git clone git@github.com:sudiarth/manifest.git ''' + repoDir + '''
+                      cd ''' + repoDir + '''
+                      echo "Updating Image TAG - $VERSION"
+                      sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml
+                      echo "Git Config"
+                      git config --global user.email "lanxic@gmail.com"
+                      git config --global user.name "lanxic"
+                      git add hello-world/values.yaml
+                      git commit -m "Update Image tag to $VERSION"
+                      git push origin master
+                      '''
                 }
             }
         }
