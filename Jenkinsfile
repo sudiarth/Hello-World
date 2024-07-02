@@ -59,27 +59,25 @@ pipeline {
                 // Clone the repository using SSH key into a specific directory
                 sh "rm -rf '${repoDir}'"  // Clean up if the directory already exists
                 sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
-                dir("$repoDir") {
-                  echo 'Updating Image TAG'
 
-                  // Update the image tag in the values.yaml file
-                  sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
+                sh "cd $repoDir"
 
-                  echo 'Git Config'
+                sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
 
-                  // Set Git configurations
-                  sh 'git config --global user.email "lanxic@gmail.com"'
-                  sh 'git config --global user.name "lanxic"'
+                echo 'Git Config'
 
-                  // Add changes
-                  sh 'git add hello-world/values.yaml'
+                // Set Git configurations
+                sh 'git config --global user.email "lanxic@gmail.com"'
+                sh 'git config --global user.name "lanxic"'
 
-                  // Commit changes
-                  sh "git commit -m 'Update Image tag to ${VERSION}'"
+                // Add changes
+                sh 'git add hello-world/values.yaml'
 
-                  // Push changes to the master branch using the SSH key
-                  sh "git push origin master"
-                }
+                // Commit changes
+                sh "git commit -m 'Update Image tag to ${VERSION}'"
+
+                // Push changes to the master branch using the SSH key
+                sh "git push origin master"
               } catch (Exception e) {
                 echo "An error occurred: ${e.getMessage()}"
                 currentBuild.result = 'FAILURE'
