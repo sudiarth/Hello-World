@@ -54,6 +54,8 @@ pipeline {
               try {
                 // Add GitHub to known hosts
                 sh "mkdir -p ~/.ssh"
+                sh "echo $SSH_KEY > ~/.ssh/id_ed25519"
+                sh "chmod 600 ~/.ssh/id_ed25519"
                 sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
 
                 // Clone the repository using SSH key into a specific directory
