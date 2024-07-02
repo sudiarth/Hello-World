@@ -51,7 +51,7 @@ pipeline {
                     script {
                         def repoDir = "${WORKSPACE}/manifest"
                         try {
-                            sh """
+                            sh '''
                               eval "$(ssh-agent -s)"
                               ssh-add $SSH_KEY
                               mkdir -p ~/.ssh
@@ -66,7 +66,7 @@ pipeline {
                               git add hello-world/values.yaml
                               git commit -m 'Update Image tag to $VERSION'
                               git push origin master
-                              """
+                              '''
                             // Clone the repository using SSH key into a specific directory
                             // sh "rm -rf '${repoDir}'"  // Clean up if the directory already exists
                             // sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
