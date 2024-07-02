@@ -47,7 +47,7 @@ pipeline {
 
     stage('Update Tag Manifest') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'lanxic', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins', keyFileVariable: 'SSH_KEY')]) {
                     script {
                         def repoDir = "${WORKSPACE}/manifest"
                         try {
