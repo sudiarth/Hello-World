@@ -58,8 +58,8 @@ pipeline {
 
                 // Add GitHub to known hosts
                 sh "mkdir -p ~/.ssh"
-                sh "echo $SSH_KEY > ~/.ssh/id_ed25519"
-                sh "chmod 600 ~/.ssh/id_ed25519"
+                sh "echo $SSH_KEY > ~/.ssh/id_rsa"
+                sh "chmod 600 ~/.ssh/id_rsa"
                 sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
                 sh "cd "
                 echo 'Updating Image TAG'
