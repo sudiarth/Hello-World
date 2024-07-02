@@ -45,73 +45,32 @@ pipeline {
       }
     }
 
-    stage('Update Tag Manifest') {
+     stages {
+        stage('Update Manifest') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins', keyFileVariable: 'SSH_KEY')]) {
-                    script {
-                        def repoDir = "${WORKSPACE}/manifest"
-                        try {
-                            sh '''
-                              eval "$(ssh-agent -s)"
-                              ssh-add $SSH_KEY
-                              mkdir -p ~/.ssh
-                              echo "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-                              git clone git@github.com:sudiarth/manifest.git $repoDir
-                              cd $repoDir
-                              echo 'Updating Image TAG - $VERSION
-                              sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml
-                              Git Config
-                              git config --global user.email "lanxic@gmail.com"
-                              git config --global user.name "lanxic"
-                              git add hello-world/values.yaml
-                              git commit -m 'Update Image tag to $VERSION'
-                              git push origin master
-                              '''
-                            // Clone the repository using SSH key into a specific directory
-                            // sh "rm -rf '${repoDir}'"  // Clean up if the directory already exists
-                            // sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
-                            // dir("$repoDir") {
-                            //     echo 'Updating Image TAG'
-
-                            //     // Update the image tag in the values.yaml file
-                            //     sh "sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml"
-
-                            //     echo 'Git Config'
-
-                            //     // Set Git configurations
-                            //     sh 'git config --global user.email "lanxic@gmail.com"'
-                            //     sh 'git config --global user.name "lanxic"'
-
-                            //     // Add changes
-                            //     sh 'git add hello-world/values.yaml'
-
-                            //     // Commit changes
-                            //     sh "git commit -m 'Update Image tag to $VERSION'"
-
-                            //     // Push changes to the master branch using the SSH key
-                            //     sh "git push origin master"
-                            // }
-                        } catch (Exception e) {
-                            echo "An error occurred: ${e.getMessage()}"
-                            currentBuild.result = 'FAILURE'
-                            throw e
-                        }
+                script {
+                    def repoDir = "${env.WORKSPACE}/manifest"
+                    withCredentials([sshUserPrivateKey(credentialsId: jenkins, keyFileVariable: 'SSH_KEY')]) {
+                        sh '''
+                          eval "$(ssh-agent -s)"
+                          ssh-add $SSH_KEY
+                          mkdir -p ~/.ssh
+                          echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+                          git clone git@github.com:sudiarth/manifest.git ''' + repoDir + '''
+                          cd ''' + repoDir + '''
+                          echo "Updating Image TAG - $VERSION"
+                          sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml
+                          echo "Git Config"
+                          git config --global user.email "lanxic@gmail.com"
+                          git config --global user.name "lanxic"
+                          git add hello-world/values.yaml
+                          git commit -m "Update Image tag to $VERSION"
+                          git push origin master
+                          '''
                     }
                 }
             }
         }
-
-    // stage('Restart Service') {
-    //   steps {
-    //     container('docker') {
-    //       withCredentials([azureServicePrincipal('azure-principal-credential')]) {
-    //         sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
-    //         sh 'az aks get-credentials --resource-group sudigitalcluster-rg --name sudigitalcluster-aks'
-    //         sh 'kubectl version'
-    //         sh 'kubectl rollout restart deployment hello-world -n ${GIT_BRANCH}'
-    //       }
-    //     }
-    //   }
-    // }
+    }
   }
 }
