@@ -51,12 +51,17 @@ pipeline {
                     script {
                         def repoDir = "${WORKSPACE}/manifest"
                         try {
+                            sh '''
+                              eval "$(ssh-agent -s)"
+                              ssh-add $SSH_KEY
+                              mkdir -p ~/.ssh
+                              echo "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+                              '''
                             // Clone the repository using SSH key into a specific directory
                             sh "rm -rf '${repoDir}'"  // Clean up if the directory already exists
                             sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
                             dir("$repoDir") {
                                 echo 'Updating Image TAG'
-                                sh "id"
 
                                 // Update the image tag in the values.yaml file
                                 sh "sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml"
