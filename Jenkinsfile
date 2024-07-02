@@ -55,14 +55,13 @@ pipeline {
                 // Clone the repository using SSH key into a specific directory
                 sh "rm -rf '${repoDir}'"  // Clean up if the directory already exists
                 sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
-                dir("$repoDir") {
 
-                  // Add GitHub to known hosts
-                  sh "mkdir -p ~/.ssh"
-                  sh "echo $SSH_KEY > ~/.ssh/id_ed25519"
-                  sh "chmod 600 ~/.ssh/id_ed25519"
-                  sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
-                  
+                // Add GitHub to known hosts
+                sh "mkdir -p ~/.ssh"
+                sh "echo $SSH_KEY > ~/.ssh/id_ed25519"
+                sh "chmod 600 ~/.ssh/id_ed25519"
+                sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+                dir("$repoDir") {                  
                   echo 'Updating Image TAG'
 
                   // Update the image tag in the values.yaml file
