@@ -56,6 +56,7 @@ pipeline {
                             sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
                             dir("$repoDir") {
                                 echo 'Updating Image TAG'
+                                sh "id"
 
                                 // Update the image tag in the values.yaml file
                                 sh "sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml"
