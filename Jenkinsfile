@@ -47,8 +47,8 @@ pipeline {
 
     stage('Update Tag Manifest') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins', keyFileVariable: 'SSH_KEY')]) {
-                  container('docker') {
+                container('docker') {
+                  withCredentials([sshUserPrivateKey(credentialsId: 'jenkins', keyFileVariable: 'SSH_KEY')]) {
                     script {
                         def repoDir = "${WORKSPACE}/manifest"
                         try {
