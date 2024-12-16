@@ -58,8 +58,10 @@ pipeline {
                     sh "rm -rf '$repoDir'"
 
                     // Clone the repository
-                    sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
-
+                    sh """
+                        GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" \
+                        git clone git@github.com:sudiarth/manifest.git '$repoDir'
+                    """
                     // Change to repository directory
                     dir("$repoDir") {
                         echo "Updating image tag in hello-world/values.yaml"
