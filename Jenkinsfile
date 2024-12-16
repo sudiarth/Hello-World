@@ -21,6 +21,21 @@ pipeline {
             image: lanxic/docker-dind-aws-az-kubectl
             securityContext:
               privileged: true
+            volumeMounts:
+            - name: ssh-key
+              mountPath: /root/.ssh
+              readOnly: true
+            command:
+            - /bin/sh
+            - -c
+            - |
+              ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+              cat /root/.ssh/known_hosts
+              sleep infinity
+          volumes:
+          - name: ssh-key
+            secret:
+              secretName: jenkins-ssh-key
         '''
     }
   }
@@ -48,8 +63,7 @@ pipeline {
     stage('Update Tag Manifest') {
       steps {
         container('docker') {
-          withCredentials([sshUserPrivateKey(credentialsId: 'jenkinsudi', keyFileVariable: 'SSH_KEY')]) {
-            script {
+          script {
                 def repoDir = "${env.WORKSPACE}/manifest"
 
                 // Ensure VERSION is set
@@ -96,7 +110,6 @@ pipeline {
                     throw e
                 }
             }
-          }
         }
       }
     }
