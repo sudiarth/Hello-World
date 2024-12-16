@@ -30,24 +30,6 @@ pipeline {
         container('docker') {
           script {
             echo "${GIT_BRANCH}"
-          }
-        }
-      }
-    }
-
-    stage('Build and Push Docker Image (dev)') {
-      steps {
-        container('docker') {
-          sh "docker build -t helloworldsudigital.azurecr.io/hello-world:${VERSION} ."
-          sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login helloworldsudigital.azurecr.io --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
-          sh "docker push helloworldsudigital.azurecr.io/hello-world:${VERSION}"
-        }
-      }
-    }
-
-    stage('Update Tag Manifest') {
-      steps {
-        script {
             def repoDir = "${env.WORKSPACE}/manifest"
 
             // Ensure VERSION is set
@@ -93,6 +75,17 @@ pipeline {
                 currentBuild.result = 'FAILURE'
                 throw e
             }
+          }
+        }
+      }
+    }
+
+    stage('Build and Push Docker Image (dev)') {
+      steps {
+        container('docker') {
+          sh "docker build -t helloworldsudigital.azurecr.io/hello-world:${VERSION} ."
+          sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login helloworldsudigital.azurecr.io --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
+          sh "docker push helloworldsudigital.azurecr.io/hello-world:${VERSION}"
         }
       }
     }
