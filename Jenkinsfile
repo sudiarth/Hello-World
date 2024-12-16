@@ -57,7 +57,6 @@ pipeline {
 
             try {
                 echo "Cloning manifest repository to ${repoDir}"
-                echo "check ssh-key ${SSH_KEY}"
                 
                 // Clean up old repository if it exists
                 sh "rm -rf '${repoDir}'"
