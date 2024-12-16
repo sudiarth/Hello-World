@@ -72,17 +72,20 @@ pipeline {
                         echo "Configuring Git for commits"
                         
                         // Set Git configurations
-                        sh 'git config --global user.email "sysadmin@cleanmedicindus.com"'
-                        sh 'git config --global user.name "sysadmin"'
+                        sh 'git config --global user.email "lanxic@gmail.com"'
+                        sh 'git config --global user.name "lanxic"'
 
                         // Stage and commit changes
                         sh 'git add hello-world/values.yaml'
                         sh "git commit -m 'Update Image tag to $VERSION'"
 
-                        echo "Pushing changes to master branch"
+                        echo "Pushing changes to branch"
                         
                         // Push changes
-                        sh "git push origin HEAD"
+                        sh """
+                            GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" \
+                            git push origin dev
+                        """
                     }
                 } catch (Exception e) {
                     echo "An error occurred while updating the manifest repository: ${e.getMessage()}"
