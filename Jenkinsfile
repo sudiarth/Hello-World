@@ -38,9 +38,9 @@ pipeline {
     stage('Build and Push Docker Image (dev)') {
       steps {
         container('docker') {
-          sh "docker build -t helloworldsudigital.azurecr.io/hello-world:${VERSION} ."
+          sh "docker build -t helloworldsudigital.azurecr.io/hello-world:$VERSION ."
           sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login helloworldsudigital.azurecr.io --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
-          sh "docker push helloworldsudigital.azurecr.io/hello-world:${VERSION}"
+          sh "docker push helloworldsudigital.azurecr.io/hello-world:$VERSION"
         }
       }
     }
@@ -50,40 +50,32 @@ pipeline {
         container('docker') {
           withCredentials([sshUserPrivateKey(credentialsId: 'jenkinsudi', keyFileVariable: 'SSH_KEY')]) {
             script {
-                def repoDir = "${env.WORKSPACE}/manifest"
-
-                // Ensure VERSION is set
-                if (!env.VERSION) {
-                    error "VERSION environment variable is not set. Aborting."
-                }
-
+                def repoDir = "${WORKSPACE}/manifest-repo"
                 try {
-                    echo "Cloning manifest repository to ${repoDir}"
+                    echo "Cloning manifest repository to $repoDir"
                     
                     // Clean up old repository if it exists
-                    sh "rm -rf '${repoDir}'"
+                    sh "rm -rf '$repoDir'"
 
                     // Clone the repository
-                    sh "git clone https://github.com/sudiarth/manifest.git '${repoDir}'"
+                    sh "git clone git@github.com:sudiarth/manifest.git '$repoDir'"
 
                     // Change to repository directory
-                    dir("${repoDir}") {
+                    dir("$repoDir") {
                         echo "Updating image tag in hello-world/values.yaml"
                         
                         // Update the image tag in the values.yaml file
-                        sh "sed -i 's/hello-world:.*/hello-world:${VERSION}/g' hello-world/values.yaml"
+                        sh "sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml"
 
                         echo "Configuring Git for commits"
                         
                         // Set Git configurations
-                        sh 'git config --global user.email "lanxic@gmail.com"'
-                        sh 'git config --global user.name "lanxic"'
+                        sh 'git config --global user.email "sysadmin@cleanmedicindus.com"'
+                        sh 'git config --global user.name "sysadmin"'
 
-                        echo "Staging changes"
-                        
                         // Stage and commit changes
                         sh 'git add hello-world/values.yaml'
-                        sh "git commit -m 'Update Image tag to ${VERSION}'"
+                        sh "git commit -m 'Update Image tag to $VERSION'"
 
                         echo "Pushing changes to master branch"
                         
