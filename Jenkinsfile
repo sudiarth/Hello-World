@@ -82,7 +82,7 @@ pipeline {
                         echo "Pushing changes to master branch"
                         
                         // Push changes
-                        sh "git push origin master"
+                        sh "git push origin HEAD"
                     }
                 } catch (Exception e) {
                     echo "An error occurred while updating the manifest repository: ${e.getMessage()}"
