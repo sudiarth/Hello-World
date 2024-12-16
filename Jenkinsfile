@@ -64,7 +64,7 @@ pipeline {
                     sh "rm -rf '${repoDir}'"
 
                     // Clone the repository
-                    sh "git clone git@github.com:sudiarth/manifest.git '${repoDir}'"
+                    sh "git clone https://github.com/sudiarth/manifest.git '${repoDir}'"
 
                     // Change to repository directory
                     dir("${repoDir}") {
