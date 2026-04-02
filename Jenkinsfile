@@ -7,6 +7,8 @@ pipeline {
   environment {
     GIT_BRANCH = getGitBranchName()
     DOCKER_REGISTRY_CREDENTIALS = credentials('AzureCredential')
+    ACR_REGISTRY = "sudigitalacr.azurecr.io"
+    IMAGE_NAME = "hello-world"
     VERSION = "${env.BUILD_ID}"
   }
   
@@ -38,9 +40,9 @@ pipeline {
     stage('Build and Push Docker Image (dev)') {
       steps {
         container('docker') {
-          sh "docker build -t helloworldsudigital.azurecr.io/hello-world:$VERSION ."
-          sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login helloworldsudigital.azurecr.io --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
-          sh "docker push helloworldsudigital.azurecr.io/hello-world:$VERSION"
+          sh "docker build -t ${ACR_REGISTRY}/${IMAGE_NAME}:${VERSION} ."
+          sh 'echo $DOCKER_REGISTRY_CREDENTIALS_PSW | docker login $ACR_REGISTRY --username $DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
+          sh "docker push ${ACR_REGISTRY}/${IMAGE_NAME}:${VERSION}"
         }
       }
     }
@@ -67,17 +69,17 @@ pipeline {
                         echo "Updating image tag in hello-world/values.yaml"
                         
                         // Update the image tag in the values.yaml file
-                        sh "sed -i 's/hello-world:.*/hello-world:$VERSION/g' hello-world/values.yaml"
+                        sh "sed -i 's|hello-world:.*|hello-world:${VERSION}|g' hello-world/values.yaml"
 
                         echo "Configuring Git for commits"
                         
                         // Set Git configurations
-                        sh 'git config --global user.email "lanxic@gmail.com"'
-                        sh 'git config --global user.name "lanxic"'
+                        sh 'git config --global user.email "sudieartha@gmail.com"'
+                        sh 'git config --global user.name "sudiarth"'
 
                         // Stage and commit changes
                         sh 'git add hello-world/values.yaml'
-                        sh "git commit -m 'Update Image tag to $VERSION'"
+                        sh "git commit -m 'Update Image tag to ${VERSION}'"
 
                         echo "Pushing changes to branch"
                         
